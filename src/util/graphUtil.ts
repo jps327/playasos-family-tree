@@ -2,7 +2,7 @@ import cytoscape from 'cytoscape';
 
 export type CampMember = {
   fullName: string;
-  referrer: string;
+  referrer?: string;
   playaName?: string;
   firstBurnYear?: number;
   location?: string;
@@ -27,7 +27,9 @@ export function campGraphToCytoscapeElements(
   members.forEach((member) => {
     // cytoscape expects unique ids for nodes, so we set the member's fullName
     // to be the id
-    allElements.push({ data: { id: member.fullName, ...member } });
+    allElements.push({
+      data: { id: member.fullName, label: member.fullName, ...member },
+    });
   });
   edges.forEach((edge) => {
     allElements.push({ data: edge });
