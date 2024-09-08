@@ -2,7 +2,12 @@ import cytoscape from 'cytoscape';
 import * as React from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { useQuery } from '@tanstack/react-query';
-import { CampGraph, campGraphToCytoscapeElements } from './util/graphUtil';
+import {
+  CampGraph,
+  campGraphToCytoscapeElements,
+  CampMember,
+} from './util/graphUtil';
+import { Drawer } from '@mantine/core';
 
 function useData() {
   return useQuery({
@@ -22,12 +27,23 @@ function useData() {
 export function App(): JSX.Element {
   const [cyAPI, setCyAPI] = React.useState<cytoscape.Core | null>(null);
   const { data: campGraph } = useData();
+  const [isPopoverOpened, setIsPopoverOpened] = React.useState(false);
+  const [selectedNode, setClickedNode] = React.useState<
+    cytoscape.NodeSingular | undefined
+  >();
+  const [selectedNodePosition, setClickedNodePosition] = React.useState({
+    x: 0,
+    y: 0,
+  });
 
   React.useEffect(() => {
     // add event handlers
     const handleNodeClick = (event: cytoscape.EventObjectNode) => {
       const node = event.target;
-      console.log(`clicked: ${node.data('fullName')}`);
+      const { x, y } = node.renderedPosition();
+      setClickedNode(node);
+      setClickedNodePosition({ x, y });
+      setIsPopoverOpened(true);
     };
 
     cyAPI?.on('click', 'node', handleNodeClick);
@@ -38,12 +54,17 @@ export function App(): JSX.Element {
     };
   }, [cyAPI]);
 
+  const selectedCampMember: CampMember | undefined = React.useMemo(() => {
+    return selectedNode?.data();
+  }, [selectedNode]);
+
+  // convert camp graph to cytoscape elements
   const cytoscapeElements = React.useMemo(() => {
     return campGraph ? campGraphToCytoscapeElements(campGraph) : [];
   }, [campGraph]);
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
+    <div className="relative flex h-screen w-screen items-center justify-center">
       {campGraph ? (
         <CytoscapeComponent
           cy={setCyAPI}
@@ -75,6 +96,17 @@ export function App(): JSX.Element {
           ]}
         />
       ) : null}
+      <Drawer
+        opened={isPopoverOpened}
+        onClose={() => setIsPopoverOpened(false)}
+        title={selectedCampMember?.fullName}
+        trapFocus={false}
+        closeOnClickOutside={false}
+        withOverlay={false}
+        position="right"
+      >
+        {selectedCampMember?.referrer}
+      </Drawer>
     </div>
   );
 }
