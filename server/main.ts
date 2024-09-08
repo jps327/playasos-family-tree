@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Basic route
-app.get('/', (req: Request, res: Response) => {
+app.get('/api/getData', (req: Request, res: Response) => {
   res.send('Hello, TypeScript with Express!');
 });
 
