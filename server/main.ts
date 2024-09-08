@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json()); // eslint-disable-line
 
 // Basic route
-app.get('/api/data', (_: Request, res: Response) => {
-  res.json(getAllData());
+app.get('/api/data', async (_: Request, res: Response) => {
+  res.json(await getAllData());
 });
 
 // Start the server
