@@ -2,12 +2,11 @@ import cytoscape from 'cytoscape';
 import * as React from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { useQuery } from '@tanstack/react-query';
-import {
-  CampGraph,
-  campGraphToCytoscapeElements,
-  CampMember,
-} from './util/graphUtil';
+import { CampGraph, CampMember } from './util/types';
+import { campGraphToCytoscapeElements } from './util/graphUtil';
 import { Drawer } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { MemberProfile } from './components/MemberProfile';
 
 function useData() {
   return useQuery({
@@ -27,23 +26,17 @@ function useData() {
 export function App(): JSX.Element {
   const [cyAPI, setCyAPI] = React.useState<cytoscape.Core | null>(null);
   const { data: campGraph } = useData();
-  const [isPopoverOpened, setIsPopoverOpened] = React.useState(false);
-  const [selectedNode, setClickedNode] = React.useState<
+  const [isDrawerOpened, drawerActions] = useDisclosure(false);
+  const [selectedNode, setSelectedNode] = React.useState<
     cytoscape.NodeSingular | undefined
   >();
-  const [selectedNodePosition, setClickedNodePosition] = React.useState({
-    x: 0,
-    y: 0,
-  });
 
   React.useEffect(() => {
     // add event handlers
     const handleNodeClick = (event: cytoscape.EventObjectNode) => {
       const node = event.target;
-      const { x, y } = node.renderedPosition();
-      setClickedNode(node);
-      setClickedNodePosition({ x, y });
-      setIsPopoverOpened(true);
+      setSelectedNode(node);
+      drawerActions.open();
     };
 
     cyAPI?.on('click', 'node', handleNodeClick);
@@ -52,7 +45,7 @@ export function App(): JSX.Element {
     return () => {
       cyAPI?.off('click', 'node', handleNodeClick);
     };
-  }, [cyAPI]);
+  }, [cyAPI, drawerActions]);
 
   const selectedCampMember: CampMember | undefined = React.useMemo(() => {
     return selectedNode?.data();
@@ -97,15 +90,16 @@ export function App(): JSX.Element {
         />
       ) : null}
       <Drawer
-        opened={isPopoverOpened}
-        onClose={() => setIsPopoverOpened(false)}
-        title={selectedCampMember?.fullName}
+        opened={isDrawerOpened}
+        onClose={drawerActions.close}
         trapFocus={false}
         closeOnClickOutside={false}
         withOverlay={false}
         position="right"
       >
-        {selectedCampMember?.referrer}
+        {selectedCampMember ? (
+          <MemberProfile member={selectedCampMember} />
+        ) : null}
       </Drawer>
     </div>
   );
