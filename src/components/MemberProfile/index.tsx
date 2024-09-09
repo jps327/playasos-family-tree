@@ -21,7 +21,7 @@ const CARD_METADATA: ReadonlyArray<{ key: keyof CampMember; label: string }> = [
 function renderMemberValue(
   value: string | string[] | number | undefined,
 ): string {
-  if (value === undefined) {
+  if (value === undefined || value === '') {
     return 'n/a';
   }
 
