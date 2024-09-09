@@ -62,7 +62,7 @@ export function App(): JSX.Element {
         <CytoscapeComponent
           cy={setCyAPI}
           elements={cytoscapeElements}
-          style={{ width: '600px', height: '600px' }}
+          style={{ width: '100%', height: '100%' }}
           layout={{ name: 'concentric' }}
           stylesheet={[
             {
