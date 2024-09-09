@@ -1,43 +1,106 @@
 import cytoscape from 'cytoscape';
 import * as React from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
+import { useQuery } from '@tanstack/react-query';
+import { CampGraph, CampMember } from './util/types';
+import { campGraphToCytoscapeElements } from './util/graphUtil';
+import { Drawer } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { MemberProfile } from './components/MemberProfile';
 
-const ELEMENTS = [
-  {
-    data: { id: 'one', label: 'Node 1', something: 'woah1' },
-    position: { x: 40, y: 40 },
-  },
-  {
-    data: { id: 'two', label: 'Node 2', something: 'woah2' },
-    position: { x: 100, y: 20 },
-  },
-  { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } },
-];
+function useData() {
+  return useQuery({
+    queryKey: ['allData'],
+    queryFn: async () => {
+      const response = await fetch('/api/data');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data: CampGraph = await response.json();
+      console.log('backend data', data);
+      return data;
+    },
+  });
+}
 
 export function App(): JSX.Element {
-  const cyRef = React.useRef<cytoscape.Core | null>(null);
+  const [cyAPI, setCyAPI] = React.useState<cytoscape.Core | null>(null);
+  const { data: campGraph } = useData();
+  const [isDrawerOpened, drawerActions] = useDisclosure(false);
+  const [selectedNode, setSelectedNode] = React.useState<
+    cytoscape.NodeSingular | undefined
+  >();
 
   React.useEffect(() => {
-    const cy = cyRef.current;
-
     // add event handlers
-    if (cy) {
-      cy.on('click', 'node', (event: cytoscape.EventObjectNode) => {
-        const node = event.target;
-        console.log(`clicked: ${node.data('something')}`);
-      });
-    }
-  }, []);
+    const handleNodeClick = (event: cytoscape.EventObjectNode) => {
+      const node = event.target;
+      setSelectedNode(node);
+      drawerActions.open();
+    };
+
+    cyAPI?.on('click', 'node', handleNodeClick);
+
+    // clean up event handlers
+    return () => {
+      cyAPI?.off('click', 'node', handleNodeClick);
+    };
+  }, [cyAPI, drawerActions]);
+
+  const selectedCampMember: CampMember | undefined = React.useMemo(() => {
+    return selectedNode?.data();
+  }, [selectedNode]);
+
+  // convert camp graph to cytoscape elements
+  const cytoscapeElements = React.useMemo(() => {
+    return campGraph ? campGraphToCytoscapeElements(campGraph) : [];
+  }, [campGraph]);
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
-      <CytoscapeComponent
-        cy={(cy) => {
-          cyRef.current = cy;
-        }}
-        elements={ELEMENTS}
-        style={{ width: '600px', height: '600px' }}
-      />
+    <div className="relative flex h-screen w-screen items-center justify-center">
+      {campGraph ? (
+        <CytoscapeComponent
+          cy={setCyAPI}
+          elements={cytoscapeElements}
+          style={{ width: '100%', height: '100%' }}
+          layout={{ name: 'concentric' }}
+          stylesheet={[
+            {
+              selector: 'node',
+              style: {
+                label: 'data(fullName)', // Use fullName as label for nodes
+                width: 50,
+                height: 50,
+                'background-color': '#61bffc',
+                'text-valign': 'center',
+                'text-halign': 'center',
+              },
+            },
+            {
+              selector: 'edge',
+              style: {
+                width: 2,
+                'line-color': '#ccc',
+                'target-arrow-color': '#ccc', // Set arrow color to match the line
+                'target-arrow-shape': 'triangle', // Define the arrow shape
+                'curve-style': 'bezier', // Use a smooth curved line for the edge
+              },
+            },
+          ]}
+        />
+      ) : null}
+      <Drawer
+        opened={isDrawerOpened}
+        onClose={drawerActions.close}
+        trapFocus={false}
+        closeOnClickOutside={false}
+        withOverlay={false}
+        position="right"
+      >
+        {selectedCampMember ? (
+          <MemberProfile member={selectedCampMember} />
+        ) : null}
+      </Drawer>
     </div>
   );
 }
