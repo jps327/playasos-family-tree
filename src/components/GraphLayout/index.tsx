@@ -60,6 +60,8 @@ export function GraphLayout({
             'background-color': '#61bffc',
             'text-valign': 'center',
             'text-halign': 'center',
+            'text-wrap': 'wrap',
+            'text-max-width': '50px',
           },
         },
         {
