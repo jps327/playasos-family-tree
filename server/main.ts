@@ -1,6 +1,6 @@
-import { getAllData } from './dataFetcher';
+import { connectToGoogleSheets, getAllData } from './dataFetcher';
 import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'; // eslint-disable-line
 
 dotenv.config({ path: './.env.server' }); // eslint-disable-line
 
@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON
 app.use(express.json()); // eslint-disable-line
+
+connectToGoogleSheets();
 
 // Basic route
 app.get('/api/data', async (_: Request, res: Response) => {
