@@ -8,7 +8,6 @@ export type CampMember = {
   secondaryConnections?: string[];
   numberOfBurnsWithCamp?: number;
   numberOfBurnsTotal?: number;
-  imgUrl?: string;
 };
 
 export type CampGraph = {

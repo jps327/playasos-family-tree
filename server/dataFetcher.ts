@@ -12,7 +12,6 @@ type CampMember = {
   secondaryConnections?: string[];
   numberOfBurnsWithCamp?: number;
   numberOfBurnsTotal?: number;
-  imgUrl?: string;
 };
 
 type Graph = {
@@ -66,7 +65,6 @@ export async function getAllData(): Promise<Graph> {
         secondaryConnections: row.get('secondaryConnections'),
         numberOfBurnsWithCamp: row.get('numBurnsWithCamp'),
         numberOfBurnsTotal: row.get('totalBurns'),
-        imgUrl: row.get('imageUrl'),
       };
       members.push(newMember);
 
