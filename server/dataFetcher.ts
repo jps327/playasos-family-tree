@@ -69,13 +69,12 @@ export async function getAllData(): Promise<Graph> {
         imgUrl: row.get('imageUrl'),
       };
       members.push(newMember);
+
       // only add edge if we have referrer data
-      if (referrer !== '' && referrer !== null) {
+      if (referrer !== '' && referrer !== null && referrer !== undefined) {
         edges.push({ source: referrer, target: name });
       }
     }
-
-    console.log(members.map((member) => member.fullName));
 
     return { members: members, edges: edges };
   }
