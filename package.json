@@ -19,6 +19,7 @@
     "@types/google-spreadsheet": "^4.0.0",
     "@types/react-cytoscapejs": "^1.2.5",
     "cytoscape": "^3.30.2",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "google-auth-library": "^9.14.1",
     "google-spreadsheet": "^4.1.4",

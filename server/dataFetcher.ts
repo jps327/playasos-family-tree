@@ -1,15 +1,18 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 
-// Initialize auth 
+// Initialize auth
 const serviceAccountAuth = new JWT({
-  email: "",
-  key: "",
+  email: process.env.SERVICE_ACCOUNT_EMAIL,
+  key: process.env.SERVICE_ACCOUNT_PRIVATE_KEY,
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
 //Initialize the google spreadsheet
-const doc = new GoogleSpreadsheet('1YBjxIiaeMb_mResgxJaLyuM1ENZoywDuVrSpKWyz2gg', serviceAccountAuth);
+const doc = new GoogleSpreadsheet(
+  '1YBjxIiaeMb_mResgxJaLyuM1ENZoywDuVrSpKWyz2gg',
+  serviceAccountAuth,
+);
 
 //Initialize CampMember Type
 type CampMember = {
@@ -41,9 +44,9 @@ type Graph = {
   edges: Array<{ source: string; target: string }>;
 };
 
-export async function getAllData(): Graph {
-  var members = [];
-  var edges = [];
+export async function getAllData(): Promise<Graph> {
+  const members = [];
+  const edges = [];
   //populate members/edges const
   await doc.loadInfo(); // loads document properties and worksheets
   const rows = await doc.sheetsByIndex[0].getRows();
@@ -61,13 +64,13 @@ export async function getAllData(): Graph {
       secondaryConnections: row.get('secondaryConnections'),
       numberOfBurnsWithCamp: row.get('numBurnsWithCamp'),
       numberOfBurnsTotal: row.get('totalBurns'),
-      imgUrl: row.get('imageUrl')
+      imgUrl: row.get('imageUrl'),
     };
     members.push[newMember];
     // only add edge if we have referrer data
     if (referrer !== '' && referrer !== null) {
-      edges.push[ {source: referrer, target: name} ];
+      edges.push[{ source: referrer, target: name }];
     }
   }
-  return { members: members, edges: edges};
+  return { members: members, edges: edges };
 }

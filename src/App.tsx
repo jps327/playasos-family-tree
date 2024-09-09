@@ -1,4 +1,3 @@
-import cytoscape from 'cytoscape';
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CampGraph, CampMember } from './util/types';
