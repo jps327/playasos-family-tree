@@ -15,7 +15,6 @@ function useData() {
         throw new Error('Network response was not ok');
       }
       const data: CampGraph = await response.json();
-      console.log('backend data', data);
       return data;
     },
   });
