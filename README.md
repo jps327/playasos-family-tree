@@ -1,4 +1,4 @@
-# Playasos Family Tree
+# Playasos Snail Trail
 
 A single page app to display the family tree of the Playasos camp!
 
