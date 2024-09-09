@@ -48,24 +48,26 @@ export async function getAllData(): Graph {
   await doc.loadInfo(); // loads document properties and worksheets
   const rows = await doc.sheetsByIndex[0].getRows();
   for (const row of rows) {
-    const newMember = {
-      fullName: row.get('fullName'),
-      referrer?: row.get('referrer'),
-      playaName?: row.get('playaName'),
-      firstCampBurnYear?: row.get('firstCampBurnYear'),
-      location?: row.get('location'),
-      bio?: row.get('bio'),
-      secondaryConnections?: row.get('secondaryConnections'),
-      numberOfBurnsWithCamp?: row.get('numberOfBurnsWithCamp'),
-      numberOfBurnsTotal?: row.get('numberOfBurnsTotal'),
-      imgUrl?: row.get('imgUrl'),
+    //Add member
+    const name = row.get('fullName');
+    const referrer = row.get('referrer');
+    const newMember: CampMember = {
+      fullName: name,
+      referrer: referrer,
+      playaName: row.get('playaName'),
+      firstCampBurnYear: row.get('firstCampBurnYear'),
+      location: row.get('location'),
+      bio: row.get('bio'),
+      secondaryConnections: row.get('secondaryConnections'),
+      numberOfBurnsWithCamp: row.get('numBurnsWithCamp'),
+      numberOfBurnsTotal: row.get('totalBurns'),
+      imgUrl: row.get('imageUrl')
     };
     members.push[newMember];
-  const referringEdge = {
-      source: row.get(referrer),
-      target: row.get('fullName')
-    };
-    edges.push[];
+    // only add edge if we have referrer data
+    if (referrer !== '' && referrer !== null) {
+      edges.push[ {source: referrer, target: name} ];
+    }
   }
   return { members: members, edges: edges};
 }
