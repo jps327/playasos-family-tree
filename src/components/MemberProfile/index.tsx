@@ -6,7 +6,7 @@ type Props = {
   member: CampMember;
 };
 
-const FOUNDER_VALUE = 'FOUNDER_NO_REFER';
+const FOUNDER_VALUE = 'FOUNDER';
 
 const CARD_METADATA: ReadonlyArray<{ key: keyof CampMember; label: string }> = [
   { key: 'playaName', label: 'Playa Name' },

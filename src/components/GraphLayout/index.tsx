@@ -39,7 +39,17 @@ export function GraphLayout({
       cy={setCyAPI}
       elements={cytoscapeElements}
       style={{ width: '100%', height: '100%' }}
-      layout={{ name: 'concentric' }}
+      layout={{
+        name: 'breadthfirst',
+        directed: true,
+        padding: 10,
+        spacingFactor: 1.5,
+        avoidOverlap: true,
+        grid: false,
+        circle: true,
+        roots: undefined,
+        maximalAdjustments: 0,
+      }}
       stylesheet={[
         {
           selector: 'node',
